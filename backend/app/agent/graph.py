@@ -1,26 +1,37 @@
 from langgraph.graph import StateGraph, END
 from app.agent.state import AgentState
 from app.agent.nodes import (
+    check_smalltalk_node, smalltalk_reply_node,
     load_context_node, retrieve_memory_node, has_documents_node,
     retrieve_docs_node, generate_answer_node,
 )
 
-def route_after_check(state):
+def route_after_smalltalk_check(state):
+    return "smalltalk_reply" if state["_is_smalltalk"] else "load_context"
+
+def route_after_doc_check(state):
     return "retrieve_docs" if state["_has_docs"] else "generate_answer"
 
 def build_graph():
     graph = StateGraph(AgentState)
 
+    graph.add_node("check_smalltalk", check_smalltalk_node)
+    graph.add_node("smalltalk_reply", smalltalk_reply_node)
     graph.add_node("load_context", load_context_node)
     graph.add_node("retrieve_memory", retrieve_memory_node)
     graph.add_node("has_documents", has_documents_node)
     graph.add_node("retrieve_docs", retrieve_docs_node)
     graph.add_node("generate_answer", generate_answer_node)
 
-    graph.set_entry_point("load_context")
+    graph.set_entry_point("check_smalltalk")
+    graph.add_conditional_edges("check_smalltalk", route_after_smalltalk_check, {
+        "smalltalk_reply": "smalltalk_reply",
+        "load_context": "load_context",
+    })
+    graph.add_edge("smalltalk_reply", END)
     graph.add_edge("load_context", "retrieve_memory")
     graph.add_edge("retrieve_memory", "has_documents")
-    graph.add_conditional_edges("has_documents", route_after_check, {
+    graph.add_conditional_edges("has_documents", route_after_doc_check, {
         "retrieve_docs": "retrieve_docs",
         "generate_answer": "generate_answer",
     })

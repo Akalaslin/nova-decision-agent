@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NOVA</title>
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="top-left">
+      <button class="icon-btn" id="openMemory" type="button" title="Chats and memory">☰</button>
+      <button class="icon-btn" id="newChat" type="button" title="Start a new conversation">✚ New chat</button>
+      <div class="brand">
+        <img class="logo-img" src="nova-logo.png" alt="NOVA logo">
+        <div><h1>NOVA</h1><p>Command Center</p></div>
+      </div>
+    </div>
+    <div class="top-right">
+      <a class="back-link" href="index.html">← About NOVA</a>
+      <span class="user-chip" id="userChip">…</span>
+      <span class="status" id="status">Connecting…</span>
+    </div>
+  </header>
+
+  <button class="insights-pill" id="openInsights" type="button">🔎 Insights</button>
+
+  <div class="grid">
+
+    <aside class="drawer left" id="memoryDrawer">
+      <div class="drawer-head"><h3>NOVA</h3><button class="icon-btn" data-close="1" type="button">✕</button></div>
+      <div class="mtabs">
+        <button class="mtab active" data-menu="chats" type="button">Chats</button>
+        <button class="mtab" data-menu="memory" type="button">Memory</button>
+      </div>
+
+      <div id="paneChats">
+        <button class="new-chat-btn" id="newChat2" type="button">✚ New chat</button>
+        <div id="chatList" class="chat-list"></div>
+      </div>
+
+      <div id="paneMemory" class="hidden">
+        <section class="stats">
+          <div class="stat"><span class="stat-icon">🎯</span><div><b id="statGoals">–</b><small>Active goals</small></div></div>
+          <div class="stat"><span class="stat-icon">🧭</span><div><b id="statConstraints">–</b><small>Constraints</small></div></div>
+          <div class="stat"><span class="stat-icon">⚖️</span><div><b id="statDecisions">–</b><small>Decisions</small></div></div>
+          <div class="stat"><span class="stat-icon">📄</span><div><b id="statDocs">–</b><small>Documents</small></div></div>
+        </section>
+        <div class="block">
+          <div class="block-head"><h3>Goals</h3><button class="mini" data-add="goal">+ Add</button></div>
+          <div id="goalsList" class="list"></div>
+        </div>
+        <div class="block">
+          <div class="block-head"><h3>Constraints</h3><button class="mini" data-add="constraint">+ Add</button></div>
+          <div id="constraintsList" class="list"></div>
+        </div>
+        <div class="block">
+          <div class="block-head">
+            <h3>Documents</h3>
+            <label class="mini">+ Upload<input type="file" id="file" accept=".txt,.pdf" hidden></label>
+          </div>
+          <div id="docsList" class="list"></div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="chatpanel">
+      <div class="chatwrap">
+        <div id="chat" class="chat"></div>
+        <div class="empty-state" id="emptyState">
+          <img src="nova-logo.png" alt="">
+          <h2>What are you deciding today?</h2>
+          <p>NOVA remembers your goals and limits, and shows the evidence behind every answer.</p>
+          <div class="starters">
+            <button class="starter" type="button" data-fill="I'm trying to decide between "><b>⚖️ Help me decide</b><span>Compare options using your goals and limits</span></button>
+            <button class="starter" type="button" data-fill="Make me a step-by-step plan to "><b>📋 Make me a plan</b><span>Turn a goal into steps you can tick off</span></button>
+            <button class="starter" type="button" data-fill="I'm going to "><b>😈 Test a decision</b><span>Type it, then open Lab → Pre-mortem</span></button>
+            <button class="starter" type="button" data-fill="What does my document say about "><b>📄 Ask about a document</b><span>Search the files you uploaded</span></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="dock">
+        <div class="usage hidden" id="usage"></div>
+        <div class="composer">
+          <textarea id="input" rows="1" placeholder="Ask NOVA, or type a decision and open Lab…"></textarea>
+          <div class="composer-actions">
+            <div class="lab-wrap">
+              <button id="labBtn" class="ghost-btn" type="button" title="Think a decision through in a new way">🧪 Lab ▾</button>
+              <div id="labMenu" class="lab-menu hidden">
+                <button type="button" data-lab="premortem">😈 Pre-mortem<small>Imagine it failed in 6 months, and why</small></button>
+                <button type="button" data-lab="flip">🔄 What would change my mind?<small>The 3 facts that could flip the advice</small></button>
+                <button type="button" data-lab="voices">🎭 Three voices<small>Optimist, sceptic and planner, then a verdict</small></button>
+                <button type="button" data-lab="tenx">⏳ 10-10-10<small>How it looks in 10 minutes, months and years</small></button>
+              </div>
+            </div>
+            <button id="premortem" class="ghost-btn" type="button">Pre-mortem</button>
+            <button id="send" type="button" aria-label="Send">↑</button>
+          </div>
+        </div>
+        <div class="dock-note">NOVA can make mistakes. Check the sources.</div>
+      </div>
+    </main>
+
+    <aside class="drawer right" id="insightsDrawer">
+      <div class="drawer-head"><h3>Insights</h3><button class="icon-btn" data-close="1" type="button">✕</button></div>
+      <div class="tabs">
+        <button class="tab active" data-tab="evidence">Evidence</button>
+        <button class="tab" data-tab="timeline">Timeline</button>
+        <button class="tab" data-tab="plans">My plans</button>
+      </div>
+      <div id="tab-evidence" class="tabbody"></div>
+      <div id="tab-timeline" class="tabbody hidden"></div>
+      <div id="tab-plans" class="tabbody hidden"></div>
+    </aside>
+
+  </div>
+</div>
+
+<div class="scrim hidden" id="scrim"></div>
+
+<div id="modal" class="modal hidden">
+  <div class="modal-card">
+    <h3 id="modalTitle"></h3>
+    <div id="modalFields"></div>
+    <div id="modalError" class="modal-error"></div>
+    <div class="modal-actions">
+      <button id="modalCancel" class="ghost">Cancel</button>
+      <button id="modalSave" class="primary">Save</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

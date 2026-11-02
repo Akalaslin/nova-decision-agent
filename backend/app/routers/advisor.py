@@ -11,7 +11,7 @@ from app.agent.graph import nova_graph
 
 router = APIRouter(prefix="/advisor", tags=["advisor"])
 
-MAX_DISTANCE = 0.5  # weak filter for now; tuned in the evaluation phase
+MAX_DISTANCE = 0.42  # weak filter for now; tuned in the evaluation phase
 
 SYSTEM_PROMPT = """You are NOVA, a personal decision intelligence assistant.
 Help the user think through decisions using their goals, constraints, past decisions and uploaded documents.
@@ -116,11 +116,14 @@ def ask_graph(req: AdviceRequest):
     result = nova_graph.invoke({
         "user_id": req.user_id,
         "question": req.question,
+        "history": req.history[-8:],
+        "search_query": req.question,
         "goals_text": "",
         "constraints_text": "",
         "memories": [],
         "docs": [],
         "answer": None,
         "_has_docs": False,
+        "_is_smalltalk": False,
     })
     return AdviceOut(answer=result["answer"], memories_used=result["memories"], documents_used=result["docs"])

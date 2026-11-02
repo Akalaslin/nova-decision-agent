@@ -68,6 +68,7 @@ class DecisionOut(BaseModel):
 class AdviceRequest(BaseModel):
     user_id: int
     question: str
+    history: list[dict] = []
 
 class AdviceOut(BaseModel):
     answer: str
