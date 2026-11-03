@@ -1464,3 +1464,35 @@ setInterval(function () {
     n.textContent = n.textContent.replace(/ \(error:.*$/, "") + " (error: " + window.novaPingError + ")";
   }
 }, 2000);
+// ---------- start-up supervisor: keep retrying until the sample data, banner and meters have really loaded ----------
+(function () {
+  if (["localhost", "127.0.0.1", ""].includes(location.hostname)) return;
+  let tries = 0;
+
+  async function step() {
+    tries += 1;
+    const statsLoaded = /\d/.test(($("statGoals") || {}).textContent || "");
+    const bannerShown = !!document.querySelector(".demo-banner");
+    const note = document.querySelector(".wake-note");
+
+    if (statsLoaded && bannerShown) {
+      if (note) note.classList.add("hidden");
+      return;
+    }
+    try {
+      if (!statsLoaded) { await api("/dashboard/" + USER_ID); loadDashboard(); }
+      if (!bannerShown) { profileTries = 0; applyProfile(); }
+      usageTries = 0; loadUsage();
+      cockpitTries = 0; bootCockpit();
+      window.novaPingError = "";
+    } catch (e) {
+      window.novaPingError = (e && e.message) ? e.message : String(e);
+    }
+    if (note && !statsLoaded) {
+      note.classList.remove("hidden");
+      note.textContent = "Loading the sample data… (attempt " + tries + (window.novaPingError ? "; error: " + window.novaPingError : "") + ")";
+    }
+    if (tries < 40) setTimeout(step, 6000);   // 40 tries x 6 s = 4 minutes
+  }
+  setTimeout(step, 6000);
+})();
