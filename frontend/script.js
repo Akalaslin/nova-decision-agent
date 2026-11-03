@@ -465,6 +465,7 @@ async function pingServer() {
       return;
     }
   } catch (e) { /* server still waking up */ }
+
   statusEl.textContent = "Waking up…";
   setTimeout(pingServer, 5000);
 }
@@ -1429,3 +1430,37 @@ guardCheck = function (data) {
   }
   setTimeout(check, 8000);
 })();
+// ---------- connection fix: always ask for fresh data, and show the real reason if the page cannot connect ----------
+(function () {
+  const realFetch = window.fetch.bind(window);
+  window.fetch = function (input, init) {
+    return realFetch(input, Object.assign({ cache: "no-store" }, init || {}));
+  };
+})();
+
+pingServer = async function () {
+  try {
+    const res = await fetch(API_BASE + "/health", { headers: { "X-Visitor-Id": visitorId } });
+    const d = await res.json();
+    if (d && d.status === "ok") {
+      statusEl.textContent = "Online";
+      statusEl.classList.add("ok");
+      window.novaPingError = "";
+      try { await loadDashboard(); } catch (e) { window.novaPingError = "dashboard: " + ((e && e.message) ? e.message : e); }
+      return;
+    }
+    window.novaPingError = "unexpected answer: " + JSON.stringify(d).slice(0, 80);
+  } catch (e) {
+    window.novaPingError = (e && e.message) ? e.message : String(e);
+  }
+  statusEl.textContent = "Waking up…";
+  setTimeout(pingServer, 5000);
+};
+
+// show that real reason in the yellow note while the page is waiting
+setInterval(function () {
+  const n = document.querySelector(".wake-note");
+  if (n && !n.classList.contains("hidden") && window.novaPingError) {
+    n.textContent = n.textContent.replace(/ \(error:.*$/, "") + " (error: " + window.novaPingError + ")";
+  }
+}, 2000);
