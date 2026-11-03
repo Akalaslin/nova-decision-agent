@@ -67,7 +67,7 @@ const visitorId = (() => {
 
 async function api(path, options = {}) {
   const headers = { ...(options.headers || {}), "X-Visitor-Id": visitorId };
-  const res = await fetch(API_BASE + path, { ...options, headers });
+  const res = await fetch(+ path, { ...options, headers });
 
   const used = res.headers.get("X-Usage-Used");
   const limit = res.headers.get("X-Usage-Limit");

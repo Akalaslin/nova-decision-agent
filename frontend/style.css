@@ -266,3 +266,14 @@ body.demo .task { pointer-events:none; }
 .demo-hint { margin-top:14px; padding:12px 16px; border-radius:14px; background:rgba(108,140,255,.08); border:1px solid var(--line); font-size:13px; line-height:1.5; color:var(--muted); max-width:640px; }
 .demo-hint b { color:var(--text); }
 .demo-hint-actions { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:10px; }
+/* short screens: the welcome screen scrolls instead of overlapping the banner and the input box */
+.empty-state { overflow-y:auto; justify-content:flex-start; padding:12px 0 20px; }
+.empty-state::before, .empty-state::after { content:""; flex:1 1 0; min-height:0; }
+@media (max-height:760px) {
+  .empty-state img { width:56px; }
+  .empty-state h2 { font-size:24px; }
+  .empty-state p { font-size:13.5px; }
+  .starter { padding:10px 14px; }
+  .starter span { display:none; }
+  .demo-hint { margin-top:6px; padding:10px 14px; font-size:12px; }
+}
