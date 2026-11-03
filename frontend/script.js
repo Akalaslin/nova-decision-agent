@@ -1384,3 +1384,48 @@ guardCheck = function (data) {
                   [...docCited].filter(k => guardPool.docs.has(k)).length;
   return { memCited: memCited.size, docCited: docCited.size, matched, ghosts };
 };
+// the free backend sleeps when idle: keep trying while it wakes up, show what is happening, reload once it is ready
+(function () {
+  if (["localhost", "127.0.0.1", ""].includes(location.hostname)) return;
+
+  let note = document.querySelector(".wake-note");
+  if (!note) {
+    note = document.createElement("div");
+    note.className = "wake-note hidden";
+    const box = $("emptyState");
+    if (box) box.appendChild(note);
+  }
+  const base = "The demo server is waking up. This can take a minute or two the first time, then it is fast. This page connects by itself.";
+  const online = () => /online/i.test(statusEl.textContent || "");
+
+  let tries = 0, lastProblem = "";
+  async function check() {
+    if (online()) {
+      note.classList.add("hidden");
+      try { sessionStorage.removeItem("nova_wake_reloads"); } catch (e) { /* storage blocked */ }
+      return;
+    }
+    tries += 1;
+    note.classList.remove("hidden");
+    note.textContent = base + " (attempt " + tries + (lastProblem ? "; last problem: " + lastProblem : "") + ")";
+    try {
+      const r = await fetch(API_BASE + "/health", { cache: "no-store" });
+      const d = await r.json();
+      if (d && d.status === "ok") {
+        let n = 0;
+        try {
+          n = Number(sessionStorage.getItem("nova_wake_reloads") || 0);
+          sessionStorage.setItem("nova_wake_reloads", String(n + 1));
+        } catch (e) { /* storage blocked */ }
+        if (n < 3) { location.reload(); return; }
+        lastProblem = "the server answers, but this page did not connect";
+      } else {
+        lastProblem = "unexpected answer from the server";
+      }
+    } catch (e) {
+      lastProblem = (e && e.message) ? e.message : "no answer yet";
+    }
+    if (tries < 60) setTimeout(check, 4000);
+  }
+  setTimeout(check, 8000);
+})();

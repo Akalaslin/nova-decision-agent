@@ -10,3 +10,8 @@ try {
 } catch (e) {
   document.documentElement.classList.remove("reveal-ready");
 }
+// wake the free backend in the background while the visitor reads the landing page
+(function () {
+  if (["localhost", "127.0.0.1", ""].indexOf(location.hostname) !== -1) return;
+  try { fetch("https://nova-decision-agent.onrender.com/health", { mode: "no-cors" }); } catch (e) { /* ignore */ }
+})();
