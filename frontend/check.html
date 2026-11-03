@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NOVA connection check</title>
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; background:#0b1020; color:#e8ecff; padding:20px; max-width:780px; margin:0 auto; line-height:1.5; }
+    .row { padding:10px 12px; margin:8px 0; border-radius:10px; background:#141b34; word-break:break-word; font-size:14px; }
+    .ok { border-left:4px solid #3ecf8e; }
+    .bad { border-left:4px solid #ff6b7a; }
+    .wait { border-left:4px solid #f0b445; }
+    .small { color:#9aa7cc; font-size:13px; }
+  </style>
+</head>
+<body>
+  <h2>NOVA connection check</h2>
+  <p class="small">This page runs the same kind of requests the app makes. Wait until every row is finished (it can take a minute if the server is asleep), then send a screenshot.</p>
+  <div class="row" id="info"></div>
+  <div id="out"></div>
+  <div class="row" id="done">Starting...</div>
+
+  <script>
+    var BASE = "https://nova-decision-agent.onrender.com";
+    var out = document.getElementById("out");
+    var info = document.getElementById("info");
+
+    var storage = "works";
+    try { localStorage.setItem("nova_check", "1"); localStorage.removeItem("nova_check"); } catch (e) { storage = "BLOCKED"; }
+    info.textContent = "Page address: " + location.origin + "  |  Browser storage: " + storage + "  |  Time: " + new Date().toLocaleTimeString();
+
+    async function test(label, path, withHeader) {
+      var d = document.createElement("div");
+      d.className = "row wait";
+      d.textContent = label + " ... running";
+      out.appendChild(d);
+      var t0 = performance.now();
+      try {
+        var opts = { cache: "no-store" };
+        if (withHeader) opts.headers = { "X-Visitor-Id": "check-page" };
+        var r = await fetch(BASE + path, opts);
+        var ms = Math.round(performance.now() - t0);
+        var body = "";
+        try { body = (await r.text()).slice(0, 90); } catch (e) { body = ""; }
+        d.className = "row " + (r.ok ? "ok" : "bad");
+        d.textContent = label + " -> HTTP " + r.status + " in " + ms + " ms   " + body;
+      } catch (e) {
+        d.className = "row bad";
+        d.textContent = label + " -> FAILED after " + Math.round(performance.now() - t0) + " ms: " + (e && e.message ? e.message : e);
+      }
+    }
+
+    (async function () {
+      await test("1. /health (plain request)", "/health", false);
+      await test("2. /health (with the app's visitor header)", "/health", true);
+      await test("3. /profiles/active (with header)", "/profiles/active", true);
+      await test("4. /dashboard/2 (with header)", "/dashboard/2", true);
+      await test("5. /usage (with header)", "/usage", true);
+      await test("6. /cockpit/2 (with header)", "/cockpit/2", true);
+      document.getElementById("done").textContent = "Finished at " + new Date().toLocaleTimeString();
+    })();
+  </script>
+</body>
+</html>
