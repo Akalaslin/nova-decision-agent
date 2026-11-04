@@ -418,3 +418,18 @@ body.demo .task { pointer-events:none; }
     max-width: calc(100vw - 24px);
   }
 }
+/* ---------- Phone: Insights lives in the top bar ---------- */
+@media (max-width: 600px) {
+  .top-right .insights-pill {
+    position: static;
+    padding: 6px 10px;
+    font-size: 11.5px;
+    box-shadow: none;
+  }
+  .brand h1 {
+    display: none;
+  }
+  .empty-state {
+    padding-bottom: 12px;
+  }
+}
