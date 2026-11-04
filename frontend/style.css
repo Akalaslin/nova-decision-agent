@@ -278,3 +278,60 @@ body.demo .task { pointer-events:none; }
   .demo-hint { margin-top:6px; padding:10px 14px; font-size:12px; }
 }
 .wake-note { margin-top:10px; font-size:12.5px; color:var(--warn); text-align:center; max-width:520px; }
+/* ---------- Phone compact fit ---------- */
+@media (max-width: 600px) {
+  /* orange demo banner: smaller and tighter */
+  .demo-banner {
+    font-size: 11px;
+    line-height: 1.35;
+    padding: 7px 10px;
+    margin: 6px 10px;
+  }
+
+  /* welcome screen: tighter heading */
+  .empty-state h1,
+  .empty-state h2 {
+    font-size: 20px;
+    margin: 6px 0;
+  }
+  .empty-state p {
+    font-size: 12px;
+    margin: 0 0 8px;
+  }
+
+  /* four starter cards in a 2 x 2 grid instead of four tall rows */
+  .starters {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 0 10px;
+  }
+  .starter {
+    padding: 10px;
+    font-size: 13px;
+    min-height: 0;
+  }
+
+  /* sample-profile box: smaller text, buttons side by side */
+  .demo-hint {
+    font-size: 11.5px;
+    line-height: 1.4;
+    padding: 10px;
+    margin: 8px 10px;
+  }
+  .demo-hint-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+  }
+  .demo-hint-actions .chip-btn {
+    font-size: 11.5px;
+    padding: 6px 10px;
+  }
+
+  /* message box stays tidy at the bottom */
+  .dock {
+    padding: 6px 10px 10px;
+  }
+}
